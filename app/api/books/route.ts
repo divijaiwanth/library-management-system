@@ -13,31 +13,38 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(bookMap: Map<string, any>) {
   try {
-    const book = await request.json()
-
-    // Validate book data
-    if (!book.title || !book.author || !book.isbn || !book.genre || !book.quantity) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    // Validate book data from the Map
+    if (
+      !bookMap.get("title") ||
+      !bookMap.get("author") ||
+      !bookMap.get("isbn") ||
+      !bookMap.get("genre") ||
+      !bookMap.get("quantity")
+    ) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const { db } = await connectToDatabase()
+    const { db } = await connectToDatabase();
+
+    // Convert the Map to an object for database insertion
+    const bookObject = Object.fromEntries(bookMap);
 
     const result = await db.collection("books").insertOne({
-      ...book,
-      addedDate: book.addedDate || new Date().toISOString(),
-    })
+      ...bookObject,
+      addedDate: bookObject.addedDate || new Date().toISOString(),
+    });
 
     return NextResponse.json(
       {
         _id: result.insertedId,
-        ...book,
+        ...bookObject,
       },
-      { status: 201 },
-    )
+      { status: 201 }
+    );
   } catch (error) {
-    console.error("Error adding book:", error)
-    return NextResponse.json({ error: "Failed to add book" }, { status: 500 })
+    console.error("Error adding book:", error);
+    return NextResponse.json({ error: "Failed to add book" }, { status: 500 });
   }
 }

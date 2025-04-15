@@ -8,6 +8,7 @@ import { BookCard } from "@/components/book-card"
 import { AddBookDialog } from "@/components/add-book-dialog"
 import { FilterDialog } from "@/components/filter-dialog"
 import type { Book } from "@/lib/types"
+import { GET, POST } from "../api/books/route"
 
 export default function Rack() {
   const [books, setBooks] = useState<Book[]>([])
@@ -37,7 +38,7 @@ export default function Rack() {
   const fetchBooks = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch("/api/books")
+      const response = await GET();
       const data = await response.json()
       setBooks(data)
       setFilteredBooks(data)
@@ -50,22 +51,20 @@ export default function Rack() {
 
   const handleAddBook = async (newBook: Omit<Book, "_id">) => {
     try {
-      const response = await fetch("/api/books", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newBook),
-      })
-
+      // Convert the newBook object to a Map
+      const bookMap = new Map(Object.entries(newBook));
+  
+      // Pass the Map to the POST function
+      const response = await POST(bookMap);
+  
       if (response.ok) {
-        fetchBooks()
-        setIsAddDialogOpen(false)
+        fetchBooks();
+        setIsAddDialogOpen(false);
       }
     } catch (error) {
-      console.error("Error adding book:", error)
+      console.error("Error adding book:", error);
     }
-  }
+  };
 
   const handleRemoveBook = async (id: string) => {
     try {
