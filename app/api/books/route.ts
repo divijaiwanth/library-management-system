@@ -13,8 +13,14 @@ export async function GET() {
   }
 }
 
-export async function POST(bookMap: Map<string, any>) {
+export async function POST(request: Request) {
   try {
+    // Parse the incoming JSON data
+    const jsonData = await request.json();
+
+    // Convert the JSON object to a Map
+    const bookMap = new Map(Object.entries(jsonData));
+
     // Validate book data from the Map
     if (
       !bookMap.get("title") ||
@@ -28,7 +34,7 @@ export async function POST(bookMap: Map<string, any>) {
 
     const { db } = await connectToDatabase();
 
-    // Convert the Map to an object for database insertion
+    // Convert the Map back to an object for database insertion
     const bookObject = Object.fromEntries(bookMap);
 
     const result = await db.collection("books").insertOne({

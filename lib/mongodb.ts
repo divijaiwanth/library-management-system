@@ -1,6 +1,6 @@
 import { MongoClient } from "mongodb"
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://divijaiwanth:Achieve%40500@librarydb.7zdup1v.mongodb.net/?retryWrites=true&w=majority&appName=libraryDB"
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://divijaiwanth:Achieve%40500@libraryDB.7zdup1v.mongodb.net/?retryWrites=true&w=majority&appName=libraryDB"
 const MONGODB_DB = process.env.MONGODB_DB || "libraryDB"
 
 // Check if we have a cached connection

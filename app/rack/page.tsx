@@ -8,7 +8,6 @@ import { BookCard } from "@/components/book-card"
 import { AddBookDialog } from "@/components/add-book-dialog"
 import { FilterDialog } from "@/components/filter-dialog"
 import type { Book } from "@/lib/types"
-import { GET, POST } from "../api/books/route"
 
 export default function Rack() {
   const [books, setBooks] = useState<Book[]>([])
@@ -36,26 +35,30 @@ export default function Rack() {
   }, [router])
 
   const fetchBooks = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const response = await GET();
-      const data = await response.json()
-      setBooks(data)
-      setFilteredBooks(data)
+      const response = await fetch("/api/books", {
+        method: "GET",
+      });
+      const data = await response.json();
+      setBooks(data);
+      setFilteredBooks(data);
     } catch (error) {
-      console.error("Error fetching books:", error)
+      console.error("Error fetching books:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleAddBook = async (newBook: Omit<Book, "_id">) => {
     try {
-      // Convert the newBook object to a Map
-      const bookMap = new Map(Object.entries(newBook));
-  
-      // Pass the Map to the POST function
-      const response = await POST(bookMap);
+      const response = await fetch("/api/books", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newBook),
+      });
   
       if (response.ok) {
         fetchBooks();
@@ -70,15 +73,15 @@ export default function Rack() {
     try {
       const response = await fetch(`/api/books/${id}`, {
         method: "DELETE",
-      })
-
+      });
+  
       if (response.ok) {
-        fetchBooks()
+        fetchBooks();
       }
     } catch (error) {
-      console.error("Error removing book:", error)
+      console.error("Error removing book:", error);
     }
-  }
+  };
 
   const applyFilters = (filters: Record<string, any>) => {
     setActiveFilters(filters)
